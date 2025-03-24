@@ -15,9 +15,15 @@ public partial class ListaProduto : ContentPage
 
     protected async override void OnAppearing()
     {
-        List<Produto> tmp = await App.Db.GetAll();
+        try
+        {
+            List<Produto> tmp = await App.Db.GetAll();
 
-        tmp.ForEach(i => lista.Add(i));
+            tmp.ForEach(i => lista.Add(i));
+        } catch (Exception ex)
+        {
+            await DisplayAlert("Ops", ex.Message, "OK");
+        }
     }
 
     private void ToolbarItem_Clicked(object sender, EventArgs e)
@@ -35,13 +41,20 @@ public partial class ListaProduto : ContentPage
 
     private async void txt_search_TextChanged(object sender, TextChangedEventArgs e)
     {
-        string q = e.NewTextValue;
+        try
+        {
+            string q = e.NewTextValue;
 
-        lista.Clear();
+            lista.Clear();
 
-        List<Produto> tmp = await App.Db.Search(q);
+            List<Produto> tmp = await App.Db.Search(q);
 
-        tmp.ForEach(i => lista.Add(i));
+            tmp.ForEach(i => lista.Add(i));
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Ops", ex.Message, "OK");
+        }
     }
 
     private void ToolbarItem_Clicked_1(object sender, EventArgs e)
@@ -62,23 +75,41 @@ public partial class ListaProduto : ContentPage
     {
         try
         {
-            var menuItem = sender as MenuItem;
-            var produto = menuItem?.BindingContext as Produto;
+            MenuItem selecionado = sender as MenuItem;
 
-            if (produto != null)
+            Produto p = selecionado.BindingContext as Produto;
+
+            bool confirm = await DisplayAlert(
+                "Tem Certeza?", $"Remover Produto {p.Descricao} ?", "Sim", "Não");
+
+            if (confirm)
             {
-                bool result = await DisplayAlert("Remover", $"Deseja remover {produto.Descricao}?", "Sim", "Não");
-
-                if (result)
-                {
-                    lista.Remove(produto);
-                    await App.Db.delete(produto);
-                }
+                await App.Db.Delete(p.Id);
+                lista.Remove(p);
             }
         }
         catch (Exception ex)
         {
             await DisplayAlert("Erro", $"Ocorreu um erro ao remover o item: {ex.Message}", "OK");
+        }
+    }
+
+    private void lst_produtos_ItemSelected(object sender, SelectedItemChangedEventArgs e)
+    {
+        try
+        {
+            Produto p = e.SelectedItem as Produto;
+
+            Navigation.PushAsync(new Views.EditarProduto
+                {
+                BindingContext = p,
+                });
+
+        }
+        
+         catch (Exception ex)
+        {
+            DisplayAlert("Ops", ex.Message, "OK");
         }
     }
 }
