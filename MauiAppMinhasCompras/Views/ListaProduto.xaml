@@ -6,41 +6,104 @@
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Somar" Clicked="ToolbarItem_Clicked_1"/>
-        <ToolbarItem Text="Adicionar " Clicked="ToolbarItem_Clicked"/>
+        <ToolbarItem Text="Adicionar" Clicked="ToolbarItem_Clicked"/>
     </ContentPage.ToolbarItems>
 
-    <VerticalStackLayout>
-        <SearchBar x:Name="txt_search" 
-                   Placeholder="Busca de Produtos" 
-                   TextChanged="txt_search_TextChanged"/>
-        <ListView x:Name="lst_produtos" ItemSelected="lst_produtos_ItemSelected">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Label">
+                <Setter Property="VerticalTextAlignment" Value="Center" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <StackLayout>
+
+        <!-- Campo para filtrar por categoria -->
+        <Entry x:Name="CategoriaEntry"
+               Placeholder="Filtrar por categoria"
+               TextChanged="CategoriaEntry_TextChanged"
+               Margin="0" />
+
+        <!-- Campo de busca de produtos -->
+        <SearchBar x:Name="txt_search"
+                   Margin="-5, 0, 0, 0"
+                   Placeholder="Busca de Produtos"
+                   TextChanged="txt_search_TextChanged" />
+
+        <!-- Botão para exibir relatório de totais por categoria -->
+        <Button Text="Exibir Relatório de Totais por Categoria"
+                Clicked="Button_Clicked"
+                Margin="10" />
+
+        <!-- ListView para exibir o relatório de totais por categoria -->
+        <ListView x:Name="lst_relatorio"
+                  IsPullToRefreshEnabled="True"
+                  IsVisible="False"
+                  Margin="10">
             <ListView.Header>
-                <Grid ColumnDefinitions=" *, *, *, *, *">
-                    <Label Grid.Column="0" Text="ID" />
-                    <Label Grid.Column="1" Text="Descrição" />
-                    <Label Grid.Column="2" Text="Preço" />
-                    <Label Grid.Column="3" Text="Qnt" />
-                    <Label Grid.Column="4" Text="Total" />
+                <Grid ColumnDefinitions="*, *">
+                    <Label Grid.Column="0" Text="Categoria" FontAttributes="Bold" />
+                    <Label Grid.Column="1" Text="Total Gasto" FontAttributes="Bold" />
                 </Grid>
             </ListView.Header>
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
                         <ViewCell.View>
-                            <Grid ColumnDefinitions=" *, *, *, *, *">
-                                <Label Grid.Column="0" Text="{Binding Id }" />
-                                <Label Grid.Column="1" Text="{Binding Descricao}" />
-                                <Label Grid.Column="2" Text="{Binding Preco}" />
-                                <Label Grid.Column="3" Text="{Binding Quantidade}" />
-                                <Label Grid.Column="4" Text="{Binding Total}" />
+                            <Grid ColumnDefinitions="*, *">
+                                <Label Grid.Column="0" Text="{Binding Categoria}" />
+                                <Label Grid.Column="1" Text="{Binding TotalGasto, StringFormat='{}{0:c}'}" />
                             </Grid>
                         </ViewCell.View>
-                        <ViewCell.ContextActions>
-                            <MenuItem Text="Remover" Clicked="MenuItem_Clicked"/>
-                        </ViewCell.ContextActions>
                     </ViewCell>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-    </VerticalStackLayout>
+
+        <!-- ListView para exibir os produtos -->
+        <Frame Padding="0" Margin="10" VerticalOptions="FillAndExpand">
+            <ListView x:Name="lst_produtos"
+                      IsPullToRefreshEnabled="True"
+                      Refreshing="lst_produtos_Refreshing"
+                      ItemSelected="lst_produtos_ItemSelected">
+                <ListView.Header>
+                    <Grid ColumnDefinitions="30, 100, 80, 50, 90, 90">
+                        <Label Grid.Column="0" Text="ID" Padding="5" FontAttributes="Bold"/>
+                        <Label Grid.Column="1" Text="Descrição" FontAttributes="Bold"/>
+                        <Label Grid.Column="2" Text="Categoria" FontAttributes="Bold"/>
+                        <Label Grid.Column="3" Text="Preço" FontAttributes="Bold"/>
+                        <Label Grid.Column="4" Text="Qnt" FontAttributes="Bold"/>
+                        <Label Grid.Column="5" Text="Total" FontAttributes="Bold"/>
+                    </Grid>
+                </ListView.Header>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <ViewCell.View>
+                                <Grid ColumnDefinitions="30, 100, 80, 50, 90, 90">
+                                    <Label Grid.Column="0" Text="{Binding Id}" />
+                                    <Label Grid.Column="1" Text="{Binding Descricao}" />
+                                    <Label Grid.Column="2" Text="{Binding Categoria}" />
+                                    <Label Grid.Column="3" Text="{Binding Preco, StringFormat='{}{0:c}'}" />
+                                    <Label Grid.Column="4" Text="{Binding Quantidade}" />
+                                    <Label Grid.Column="5" Text="{Binding Total, StringFormat='{}{0:c}'}" />
+                                </Grid>
+                            </ViewCell.View>
+                            <ViewCell.ContextActions>
+                                <MenuItem Text="Remover" Clicked="MenuItem_Clicked"/>
+                            </ViewCell.ContextActions>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Frame>
+
+        <Button x:Name="VoltarButton"
+                Text="Voltar"
+                Clicked="VoltarButton_Clicked"
+                Margin="0"
+                IsVisible="False" />
+
+    </StackLayout>
 </ContentPage>
